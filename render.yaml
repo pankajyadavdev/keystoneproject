@@ -1,0 +1,57 @@
+services:
+  - type: web
+    name: keystone-api
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    envVars:
+      - key: DATABASE_HOST
+        fromDatabase:
+          name: keystone-db
+          property: host
+      - key: DATABASE_PORT
+        fromDatabase:
+          name: keystone-db
+          property: port
+      - key: DATABASE_NAME
+        fromDatabase:
+          name: keystone-db
+          property: database
+      - key: DATABASE_USERNAME
+        fromDatabase:
+          name: keystone-db
+          property: user
+      - key: DATABASE_PASSWORD
+        fromDatabase:
+          name: keystone-db
+          property: password
+      - key: KEYSTONE_DEMO_USERNAME
+        value: manager@maplegrove.in
+      - key: KEYSTONE_DEMO_PASSWORD
+        sync: false
+      - key: KEYSTONE_JWT_SECRET
+        generateValue: true
+
+  - type: web
+    name: keystone-frontend
+    runtime: docker
+    plan: free
+    region: singapore
+    dockerfilePath: ./Dockerfile.frontend
+    dockerContext: .
+    envVars:
+      - key: API_UPSTREAM
+        fromService:
+          type: web
+          name: keystone-api
+          property: hostport
+
+databases:
+  - name: keystone-db
+    plan: free
+    region: singapore
+    postgresMajorVersion: "17"
+    databaseName: keystone
+    user: keystone
