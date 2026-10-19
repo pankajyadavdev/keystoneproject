@@ -42,11 +42,13 @@ services:
     dockerfilePath: ./Dockerfile.frontend
     dockerContext: .
     envVars:
+      - key: API_SCHEME
+        value: https
       - key: API_UPSTREAM
         fromService:
           type: web
           name: keystone-api
-          property: hostport
+          envVarKey: RENDER_EXTERNAL_HOSTNAME
 
 databases:
   - name: keystone-db
